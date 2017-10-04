@@ -30,7 +30,7 @@ and you are done!
 
 RxLoading will bind "loadingLayout" to your rx network call stream, when the stream is subscribed the layout will move to "loading" state, once an item arrives the loading is done.
 
-This is the simplest and frequent occurring flow, but RxLoading supports much more.
+This is the simplest and most frequent occurring flow, but RxLoading supports much more.
 
 This library is made of 2 components:
 
@@ -52,7 +52,7 @@ This library is made of 2 components:
 ## **LoadingLayout Usage**
 Some of it's features are listed above, let's see how we use it.
 
-it's basic functionality is the ability to hide and show other views, so while we load a page we can only show the relevant parts and when the views are ready we can show them.
+it's basic functionality is the ability to hide and show other views, so while we load a page we can only show the relevant parts, hide the rest and when the data is ready we can show the views.
 
 #### **wrap it:** 
 ```xml
@@ -116,9 +116,9 @@ related attributes you can use:
         referenced_ids one by one.
  - boolean **`invertReferencedIds`** - used with referenceSiblings, if true referencedIds will act as white list of views not to control.
 
-using  referenceSiblings you can get the same effect as wrap but without overhead.
+Using referenceSiblings you can get the same effect as wrap but without the overhead.
 
-other from that we got some more attributes to control the loading behavior: 
+Other from that we got some more attributes to control the loading behavior: 
 
  - booelan **`progressBarVisibility`** - if set to false loading state will just be an invisible layout hiding other layouts.
  - int **`initSetStateDelayMilliseconds`** - default is 200, this is meant to prevent flickers, it will only set the initial state after this delay, in case of a very quick request we will not see the loading view that way.
