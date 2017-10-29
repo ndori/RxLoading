@@ -255,7 +255,7 @@ networkCall().compose(RxLoading.<>create(loadingLayout1)).compose(RxLoading.<>cr
 But what about the other direction? let's say we want one `loadingLayout` that covers the entire screen, but the data for that screen is actually composed out of 3 different network request?
 Well this is a job for `loadingLayout`, it support multiple states, when you set a state for it you need to pass an id.
 `loadingLayout` will then decide it state by combining all those state by priority:
-`LoadingFailed` >> `Loading` >> `Done` >> `NoData`.
+`LoadingFailed` >> `Loading` >> `NoData` >> `Done`.
 It's enough there is one failure to make `loadingLayout` show it has failed, all states must be `Done` in order for it to be in that state and so on... 
 How you take care of it with `RxLoading`? it will take care of it for you, each `RxLoading` defines a different id so you can compose several `RxLoading` instances with a single `LoadingLayout`, cheers.
 ```java
