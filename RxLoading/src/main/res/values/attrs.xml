@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2017 ndori
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <declare-styleable name="LoadingLayout">
+        <!--like in ConstraintLayout barrier, the format will be id, id, id. any view here will
+        be hide/show, unless invert_referenced_ids and reference_siblings are on then it will act
+         as white list-->
+        <attr name="referencedIds" format="string"/>
+        <!-- if set to true it will hide/show all it sibling, this is instead of using
+referenced_ids one by one -->
+        <attr name="referenceSiblings" format="boolean"/>
+        <!-- used with reference_siblings, if true referenced_ids will act as white list of views
+ -->
+        <attr name="invertReferencedIds" format="boolean"/>
+
+        <!-- true by default, if false will just be an invisible layout hiding other layouts -->
+        <attr name="progressBarVisibility" format="boolean"/>
+        <!-- default is 200, this is meant to prevent flickers, it will only set the initial
+state after this delay, in case of a very quick request we will not see the loading view
+that way-->
+        <attr name="initSetStateDelayMilliseconds" format="integer"/>
+        <!--if set, it will set the visibility of all hidden views to this vaule, otherwise when
+loading occurs it will save a snapshot of the visibility state of each view and will set
+it back upon completion
+one scenario could be in order to prevent filckering, you will set all the views to be
+hidden by default and loadingView will make sure to make them visible when done-->
+        <attr name="forceDoneVisibility" format="boolean"/>
+
+        <!--a drawable-->
+        <attr name="noDataImage" format="reference"/>
+        <!-- simple string for now-->
+        <attr name="noDataText" format="string"/>
+        <!-- text for failed situation-->
+        <!-- a text to be shown when a no data button is available-->
+        <attr name="noDataActionText" format="string"/>
+        <attr name="customNoDataStateLayout" format="reference"/>
+
+        <attr name="hideImages" format="boolean"/>
+        <!--a drawable-->
+        <attr name="failImage" format="reference"/>
+        <attr name="failText" format="string"/>
+        <!-- a text to be shown when a retry option is available-->
+        <attr name="failActionText" format="string"/>
+        <!-- false by default, if used you also need to use "fail_retry_text"-->
+        <attr name="failActionEnabled" format="boolean"/>
+        <attr name="customLoadingFailedStateLayout" format="reference"/>
+        <attr name="customLoadingStateLayout" format="reference"/>
+
+        <!-- if this is a request to data it good to start with loading, if this will be used for
+         to send a request later on it should be done-->
+        <attr name="initialState" format="enum">
+            <enum name="LOADING" value="0"/>
+            <enum name="LOADING_FAIL" value="1"/>
+            <enum name="NO_DATA" value="2"/>
+            <enum name="DONE" value="3"/>
+        </attr>
+        <!--the size of the progressBar, you might want it very small if put in certain locations-->
+        <attr name="progressBarSize" format="enum">
+            <enum name="REGULAR" value="0"/>
+            <enum name="SMALL" value="1"/>
+        </attr>
+
+        <!-- GONE by default, if gone in loading/fail/empty state it will only take the space
+        needed, if INVISIBLE it will take at least the space of the underling hidden views-->
+        <attr name="referencedViewsVisibility" format="enum">
+            <enum name="GONE" value="8"/>
+            <enum name="INVISIBLE" value="4"/>
+        </attr>
+    </declare-styleable>
+</resources>

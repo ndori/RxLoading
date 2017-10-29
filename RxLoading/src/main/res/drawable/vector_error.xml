@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="111.2dp"
+    android:height="88.2dp"
+    android:viewportWidth="556"
+    android:viewportHeight="444">
+    <path
+        android:fillColor="#eee"
+        android:name="Ellipse 5"
+        android:pathData="m275.5 10c117.9 0 213.5 95.6 213.5 213.5c0 117.9 -95.6 213.5 -213.5 213.5c-117.9 0 -213.5 -95.6 -213.5 -213.5c0 -117.9 95.6 -213.5 213.5 -213.5z" />
+    <path
+        android:name="Ellipse 5"
+        android:pathData="m275.5 20c112.4 0 203.5 91.1 203.5 203.5c0 112.4 -91.1 203.5 -203.5 203.5c-112.4 0 -203.5 -91.1 -203.5 -203.5c0 -112.4 91.1 -203.5 203.5 -203.5zm0 -10c-117.9 0 -213.5 95.6 -213.5 213.5c0 117.9 95.6 213.5 213.5 213.5c117.9 0 213.5 -95.6 213.5 -213.5c0 -117.9 -95.6 -213.5 -213.5 -213.5z"
+        android:fillColor="#ccc" />
+    <path
+        android:fillColor="#ccc"
+        android:name="! copy"
+        android:pathData="m290.9 95.9h-33.7l2.3 181.4h29l2.4 -181.4zm-30.2 249.8c3.2 3.4 7.9 5.2 14.2 5.2c6.3 0 11 -1.7 14.3 -5.2c3.2 -3.4 4.9 -7.8 4.9 -13.1c0 -5.3 -1.6 -9.7 -4.9 -13.2c-3.2 -3.6 -8 -5.4 -14.3 -5.4c-6.3 0 -11 1.8 -14.2 5.4c-3.2 3.6 -4.8 8 -4.8 13.2c0 5.3 1.6 9.6 4.8 13.1z" />
+</vector>
