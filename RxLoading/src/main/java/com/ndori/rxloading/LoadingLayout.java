@@ -92,19 +92,6 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
     private int referencedViewsVisibility;
     private boolean hideImages;
 
-
-    @Override
-    public LoadingState getState() {
-        return state;
-    }
-
-    @Override
-    public LoadingState getState(String id) {
-        final LoadingState state = multiState.get(id);
-        return state != null ? state : getState(); //is that a good behaviour?
-    }
-
-
     private Set<OnClickListener> onFailedRetryButtonClickListener = new LinkedHashSet<>();
 
     @Override
@@ -362,25 +349,10 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         }
     }
 
-
-    private Map<String, LoadingState> multiState = new LinkedHashMap<>();
+    MultiStateLoadingLayout multiStateLoadingLayout = new MultiStateLoadingLayout(this);
     @Override
     public void setState(String id, LoadingState newState){
-        //I could make it faster then o(N) but I assume N is relatively small
-        LoadingState prevState = multiState.put(id, newState);
-        setState(calcGlobalState());
-    }
-
-    private LoadingState calcGlobalState() {
-        if (multiState.containsValue(LoadingState.LOADING_FAIL))
-            return LoadingState.LOADING_FAIL;
-        if (multiState.containsValue(LoadingState.LOADING))
-            return LoadingState.LOADING;
-        if ( multiState.containsValue(LoadingState.NO_DATA))
-            return LoadingState.NO_DATA;
-        if (multiState.containsValue(LoadingState.DONE))
-            return LoadingState.DONE;
-        return this.state;
+        multiStateLoadingLayout.setState(id, newState);
     }
 
     @Override
@@ -405,6 +377,16 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         }
         invalidate();
         requestLayout();
+    }
+
+    @Override
+    public LoadingState getState() {
+        return state;
+    }
+
+    @Override
+    public LoadingState getState(String id) {
+        return multiStateLoadingLayout.getState(id);
     }
 
     @Override
