@@ -159,30 +159,21 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
     public Observable<T> call(Observable<T> observable) {
         if ( configurationSubject == null) {
             configurationSubject = BehaviorSubject.create(); //this will cause the last state once binded.
-            Observable.combineLatest(configurationSubject.delaySubscription(bindSubject), bindSubject, new Func2<ILoadingStateConfiguration, WeakReference<ILoadingLayout>, Pair<ILoadingStateConfiguration, WeakReference<ILoadingLayout>>>() {
-                @Override
-                public Pair<ILoadingStateConfiguration, WeakReference<ILoadingLayout>> call(ILoadingLayout.ILoadingStateConfiguration configuration, WeakReference<ILoadingLayout> loadingInterfaceWeakReference) {
-                    return new Pair<>(configuration, loadingInterfaceWeakReference);
-                }
-            })
+            Observable.combineLatest(configurationSubject.delaySubscription(bindSubject), bindSubject, Pair::new)
                     .delaySubscription(bindSubject) //it will only subscribe when we are first binded, this is not a must as combine will keep it working
                     .onBackpressureBuffer().observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Action1<Pair<ILoadingLayout.ILoadingStateConfiguration, WeakReference<ILoadingLayout>>>() {
-                @Override
-                public void call(Pair<ILoadingStateConfiguration, WeakReference<ILoadingLayout>> p) {
-//                    Log.e("DEBUG", "set configuration" + configuration);
-                    final ILoadingLayout ILoadingLayout = p.second.get();
-                    if ( ILoadingLayout != null)
-                        p.first.set(ILoadingLayout);
-                }
-            });
+                    .subscribe(p -> {
+    //                    Log.e("DEBUG", "set configuration" + configuration);
+                        final ILoadingLayout ILoadingLayout = p.second.get();
+                        if ( ILoadingLayout != null)
+                            p.first.set(ILoadingLayout);
+                    });
         }
+
         return observable
-                .doOnSubscribe(new Action0() {
-                    public void call() {
-                        //doOnSubscribe runs on the thread of subscription...  https://groups.google.com/forum/#!topic/rxjava/TCGBiT0gbyI
-                        scheduleSetState(LoadingState.LOADING);
-                    }
+                .doOnSubscribe(() -> {
+                    //doOnSubscribe runs on the thread of subscription...  https://groups.google.com/forum/#!topic/rxjava/TCGBiT0gbyI
+                    scheduleSetState(LoadingState.LOADING);
                 })
                 .doOnEach(new Subscriber<T>() {
                     @Override
@@ -201,46 +192,28 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
                         scheduleSetState(getOnNextLoadingConfiguration(t));
                     }
                 })
-                .doOnUnsubscribe(new Action0() {
-                    @Override
-                    public void call() {
-                        //in case we subscribe but no data arrived yet and we unsubscribe. this can be usuable in case the loading is blocking the ui
-                        setNoDataStateIfNeeded();
-                    }
-                }).retryWhen(new Func1<Observable<? extends Throwable>, Observable<?>>() {
-                    @Override
-                    public Observable<?> call(Observable<? extends Throwable> observable) {
-                        return observable.observeOn(AndroidSchedulers.mainThread()) //we need this because we are accessing the loadingLayout
+                //in case we subscribe but no data arrived yet and we unsubscribe. this can be usuable in case the loading is blocking the ui
+                .doOnUnsubscribe(this::setNoDataStateIfNeeded).retryWhen(observable1 -> observable1.observeOn(AndroidSchedulers.mainThread()) //we need this because we are accessing the loadingLayout
+                        .delaySubscription(bindSubject)
+                        .flatMap(new Func1<Throwable, Observable<?>>() {
+                            @Override
+                            public Observable<?> call(Throwable throwable) {
+                                //this will be called only when there is a bind so it can't be null
+                                if (getLoadingInterface() != null && !getLoadingInterface().isRetryEnabled())
+                                    return Observable.error(throwable); //if retry isn't enabled we want to propagate the error
+                                return retrySubject;
+                            }
+                        })).repeatWhen(observable12 -> observable12.observeOn(AndroidSchedulers.mainThread()) //we need this because we are accessing the loadingLayout
                                 .delaySubscription(bindSubject)
-                                .flatMap(new Func1<Throwable, Observable<?>>() {
-                                    @Override
-                                    public Observable<?> call(Throwable throwable) {
-                                        //this will be called only when there is a bind so it can't be null
-                                        if (getLoadingInterface() != null && !getLoadingInterface().isRetryEnabled())
-                                            return Observable.error(throwable); //if retry isn't enabled we want to propagate the error
-                                        return retrySubject;
-                                    }
-                                });
-                    }
-                }).repeatWhen(new Func1<Observable<? extends Void>, Observable<?>>() {
-                    @Override
-                    public Observable<?> call(Observable<? extends Void> observable) {
-                        return observable.observeOn(AndroidSchedulers.mainThread()) //we need this because we are accessing the loadingLayout
-                                .delaySubscription(bindSubject)
-                                .flatMap(new Func1<Void, Observable<?>>() {
-                                    @Override
-                                    public Observable<?> call(Void none) {
-                                        //this will be called only when there is a bind so it can't be null
-                                        //a state where we get an error in onNext as an Item and want to retry
-                                        ILoadingLayout loadingLayout = getLoadingInterface();
-                                        if (loadingLayout != null &&
-                                                (loadingLayout.getState() != ILoadingLayout.LoadingState.LOADING_FAIL || !loadingLayout.isRetryEnabled()))
-                                            return Observable.empty(); //if retry isn't enabled we want to propagate the complete
-                                        return retrySubject;
-                                    }
-                                });
-                        }
-                });
+                                .flatMap((Func1<Void, Observable<?>>) none -> {
+                                    //this will be called only when there is a bind so it can't be null
+                                    //a state where we get an error in onNext as an Item and want to retry
+                                    ILoadingLayout loadingLayout = getLoadingInterface();
+                                    if (loadingLayout != null &&
+                                            (loadingLayout.getState() != LoadingState.LOADING_FAIL || !loadingLayout.isRetryEnabled()))
+                                        return Observable.empty(); //if retry isn't enabled we want to propagate the complete
+                                    return retrySubject;
+                                }));
                 //TODO: I don't like the observeOn(AndroidSchedulers.mainThread()) in here, it might force sync with thread which may be slower
     }
 
@@ -271,16 +244,13 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
      * @return this
      */
     public RxLoading<T> setStateProvider(final IStateProvider<T> stateProvider){
-        this.configurationProvider = new IConfigurationProvider<T>() {
-            @Override
-            public ILoadingLayout.ILoadingStateConfiguration nextConfiguration(T t) {
-                ILoadingLayout.LoadingState state = stateProvider.nextState(t);
-                switch (state){
-                    case LOADING_FAIL:
-                        return new ILoadingLayout.FailILoadingStateConfiguration(uuid, stateProvider.getFailedMessage(t), stateProvider.isRetryEnabled(t), onRetryListener);
-                    default:
-                        return configuration.get(state);
-                }
+        this.configurationProvider = t -> {
+            LoadingState state = stateProvider.nextState(t);
+            switch (state){
+                case LOADING_FAIL:
+                    return new ILoadingLayout.FailILoadingStateConfiguration(uuid, stateProvider.getFailedMessage(t), stateProvider.isRetryEnabled(t), onRetryListener);
+                default:
+                    return configuration.get(state);
             }
         };
         return this;
@@ -315,11 +285,6 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
 
     //we use a subject because ILoadingLayout can be rebinded and we need to "resubscribe" to it.
     protected PublishSubject<Void> retrySubject = PublishSubject.create();
-    protected final View.OnClickListener onRetryListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            retrySubject.onNext(null);
-        }
-    };
+    protected final View.OnClickListener onRetryListener = v -> retrySubject.onNext(null);
 
 }

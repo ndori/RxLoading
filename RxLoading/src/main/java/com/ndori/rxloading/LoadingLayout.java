@@ -108,14 +108,11 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
 
     private void setOnFailedRetryButtonClickListener() {
         if ( loadingFailedRetryButton != null)
-            loadingFailedRetryButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Set<OnClickListener> listeners = new LinkedHashSet<>(onFailedRetryButtonClickListener);
-                    for (OnClickListener onClickListener : listeners){
-                        if ( onClickListener != null)
-                            onClickListener.onClick(v);
-                    }
+            loadingFailedRetryButton.setOnClickListener(v -> {
+                Set<OnClickListener> listeners = new LinkedHashSet<>(onFailedRetryButtonClickListener);
+                for (OnClickListener onClickListener : listeners){
+                    if ( onClickListener != null)
+                        onClickListener.onClick(v);
                 }
             });
     }
@@ -130,12 +127,9 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
 
     private void setOnNoDataActionButtonClickListener() {
         if ( noDataActionButton != null)
-            noDataActionButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if ( onNoDataActionListener != null)
-                        onNoDataActionListener.onClick(v);
-                }
+            noDataActionButton.setOnClickListener(v -> {
+                if ( onNoDataActionListener != null)
+                    onNoDataActionListener.onClick(v);
             });
     }
 
@@ -274,12 +268,9 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
 //            }
 //        });
         setState(state);
-        postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                intermediateBlank = false;
-                setState(state); //a refresh
-            }
+        postDelayed(() -> {
+            intermediateBlank = false;
+            setState(state); //a refresh
         }, initSetStateDelayMilliseconds); //to prevent "flicker" if data is returned quickly
     }
 

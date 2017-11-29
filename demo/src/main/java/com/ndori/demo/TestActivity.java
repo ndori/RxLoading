@@ -87,30 +87,16 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void doGoodNetworkCall(final LoadingLayout layout) {
-        Observable.defer(new Func0<Observable<Integer>>() {
-            @Override
-            public Observable<Integer> call() {
-                Log.e("DEBUG", "Network Call started");
-                return goodNetworkRequest().compose(new RxLoading<Integer>(layout))
-                        .map(new Func1<Integer, Integer>() {
-                            @Override
-                            public Integer call(Integer integer) {
-                                Log.e("DEBUG", "map2");
-                                return integer;
-                            }
-                        }).subscribeOn(Schedulers.io());
-            }
-        }).subscribeOn(Schedulers.io()).subscribe(new Action1<Integer>() {
-            @Override
-            public void call(Integer integer) {
-                Log.e("DEBUG", "on Network Ended");
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                Log.e("ERROR", "error", throwable);
-            }
-        });
+        Observable.defer(() -> {
+            Log.e("DEBUG", "Network Call started");
+            return goodNetworkRequest().compose(new RxLoading<>(layout))
+                    .map(integer -> {
+                        Log.e("DEBUG", "map2");
+                        return integer;
+                    }).subscribeOn(Schedulers.io());
+        }).subscribeOn(Schedulers.io())
+                .subscribe(integer -> Log.e("DEBUG", "on Network Ended"),
+                        throwable -> Log.e("ERROR", "error", throwable));
     }
 
 
@@ -136,12 +122,9 @@ public class TestActivity extends AppCompatActivity {
     }
     @NonNull
     private Observable<Integer> goodNetworkRequest() {
-        return Observable.just(1).delay(2, TimeUnit.SECONDS, Schedulers.newThread()).map(new Func1<Integer, Integer>() {
-            @Override
-            public Integer call(Integer integer) {
-                Log.e("DEBUG", "map");
-                return integer;
-            }
+        return Observable.just(1).delay(2, TimeUnit.SECONDS, Schedulers.newThread()).map(integer -> {
+            Log.e("DEBUG", "map");
+            return integer;
         });
     }
 
@@ -164,12 +147,7 @@ public class TestActivity extends AppCompatActivity {
             }
         });
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                rxLoading.bind(layout);
-            }
-        }, 4000);
+        handler.postDelayed(() -> rxLoading.bind(layout), 4000);
     }
 
 
@@ -187,13 +165,10 @@ public class TestActivity extends AppCompatActivity {
 
     @NonNull
     private Observable<Integer> badNetworkRequest() {
-        return Observable.just(0).delay(2, TimeUnit.SECONDS).map(new Func1<Integer, Integer>() {
-            @Override
-            public Integer call(Integer integer) {
-                integer = null;
-                integer.equals(0);
-                return 5/0;
-            }
+        return Observable.just(0).delay(2, TimeUnit.SECONDS).map(integer -> {
+            integer = null;
+            integer.equals(0);
+            return 5/0;
         });
     }
 
