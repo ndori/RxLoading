@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2017 ndori
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +12,14 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.ndori.demo">
+    package="com.ndori.demo">
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -25,11 +28,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.ndori.demo.MainActivity">
+        <activity android:name=".TestActivity"
+            android:label="Test">
+        </activity>
+        <activity android:name=".NetworkRequestActivity"
+            android:label="Network Request">
+        </activity>
+        <activity android:name=".ItemsDemo.ItemsActivity"
+            android:theme="@style/NoActionBar"
+            android:label="Items Requests">
+        </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login" />
+        <activity android:name=".LaucherActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>

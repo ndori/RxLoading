@@ -15,6 +15,47 @@
  */
 
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release' // must be applied after your artifact generating plugin (eg. java / com.android.library)
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.7.0'
+    }
+}
+publish {
+    userOrg = 'ndori'
+    groupId = 'com.ndori'
+    artifactId = 'rxloading'
+    publishVersion = '1.0'
+    desc = 'Oh hi, this is a nice description for a project, right?'
+    website = 'https://github.com/ndori/RxLoading'
+}
+//ext {
+//    bintrayRepo = 'maven'
+//    bintrayName = 'RxLoading'
+//
+//    publishedGroupId = 'com.ndori.rxloading'
+//    libraryName = 'RxLoading'
+//    artifact = 'rxloading'
+//
+//    libraryDescription = 'An RxJava library for showing a loading (i.e. progress bar) state while waiting for async data with minimal effort and advanced options.'
+//
+//    siteUrl = 'https://github.com/nuuneoi/FBLikeAndroid'
+//    gitUrl = 'https://github.com/nuuneoi/FBLikeAndroid.git'
+//
+//    libraryVersion = '1.0'
+//
+//    developerId = 'ndori'
+//    developerName = 'Nitzan Dori'
+//    developerEmail = 'nitzan.dori@gmail.com'
+//
+//    licenseName = 'The Apache Software License, Version 2.0'
+//    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//    allLicenses = ["Apache-2.0"]
+//}
 
 android {
     compileSdkVersion 25
@@ -56,3 +97,5 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
 }
+
+

@@ -40,7 +40,7 @@ import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity {
+public class TestActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,12 +154,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void call(Integer integer) {
                 Log.e("DEBUG", "on Network Ended");
-                Toast.makeText(MainActivity.this, "Got number = " + integer, Toast.LENGTH_SHORT).show();
+                Toast.makeText(TestActivity.this, "Got number = " + integer, Toast.LENGTH_SHORT).show();
             }
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
-                Toast.makeText(MainActivity.this, "ERROR!!!! - end of subscription", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TestActivity.this, "ERROR!!!! - end of subscription", Toast.LENGTH_SHORT).show();
                 Log.e("DEBUG", "on Network Fail", throwable);
             }
         });
