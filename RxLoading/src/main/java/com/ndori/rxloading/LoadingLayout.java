@@ -43,10 +43,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
+
+//import java.util.HashSet;
 
 /**
  * A layout that includes a progressbar, a fail and empty state. <br>
@@ -73,6 +73,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
     private ImageView noDataImageView;
     private TextView noDataMessage;
     private String referencedIds;
+//    private Set<Integer> referencedIdsNums = new HashSet<>();
     private String failRetryText;
     private Button loadingFailedRetryButton;
     private boolean referenceSiblings;
@@ -255,9 +256,23 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         //TODO: better way?
-        final View parent = (View) getParent();
+        final ViewGroup parent = (ViewGroup) getParent();
         initReferencedIds(getContext(), parent);
         initReferenceSiblings(parent);
+//        parent.setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
+//            @Override
+//            public void onChildViewAdded(View parent, View child) {
+//                //TODO: think on logic
+//                if ( referenceSiblings && (!invertReferencedIds || !referencedIdsNums.contains(child.getId()))) {
+//                    referencedViews.add(child);
+//                }
+//            }
+//
+//            @Override
+//            public void onChildViewRemoved(View parent, View child) {
+//                referencedViews.remove(child);
+//            }
+//        });
         setState(state);
         postDelayed(new Runnable() {
             @Override
@@ -296,6 +311,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
             int intId = getResources().getIdentifier(id.trim(), "id", context.getPackageName());
             if ( intId == 0)
                 continue;
+//            referencedIdsNums.add(intId);
             View view = parent.findViewById(intId);
             if ( view != null) //safety
                 referencedViews.add(view);
