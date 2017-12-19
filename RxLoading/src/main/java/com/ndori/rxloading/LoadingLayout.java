@@ -345,6 +345,8 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
                     if ( isForceDoneVisibilityEnabled) {
                         view.setVisibility(View.VISIBLE);
                     } else {
+                        if ( view.getVisibility() != referencedViewsVisibility)
+                            continue; //the visibility has changed by someone else, so don't touch it
                         Integer visibility = (Integer) view.getTag(R.id.VISIBILITY_KEY); //if we put (Integer) with ? as if it will throw exception in case of null
                         if (visibility != null) {
                             view.setVisibility(visibility);
