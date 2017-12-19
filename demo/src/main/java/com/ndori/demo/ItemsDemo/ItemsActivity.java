@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.RadioButton;
 
 import com.ndori.demo.R;
+import com.ndori.demo.Utils;
 import com.ndori.rxloading.LoadingLayout;
 import com.ndori.rxloading.RxLoading;
 
@@ -54,7 +55,7 @@ public class ItemsActivity extends AppCompatActivity {
     private LoadingLayout addLoadingLayout;
 
     public void onAdd(View view) {
-        Observable.just(newItemIndex++).delaySubscription(2, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
+        Observable.just(newItemIndex++).delaySubscription(Utils.getRandomDelayMilliseconds(), TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io())
                 .compose(RxLoading.<Integer>create(addLoadingLayout))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<Integer>() {

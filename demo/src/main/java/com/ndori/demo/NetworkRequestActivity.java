@@ -87,13 +87,13 @@ public void call(Throwable throwable) {
     Integer requestResult = 0;
     @NonNull
     private Observable<Integer> goodNetworkRequest() {
-        return Observable.just(++requestResult).delay(2, TimeUnit.SECONDS).subscribeOn(Schedulers.io());
+        return Observable.just(++requestResult).delay(Utils.getRandomDelayMilliseconds(), TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io());
     }
 
     Integer badRequestResult = 0;
     @NonNull
     private Observable<Integer> badNetworkRequestInItem() {
-        return Observable.just(--badRequestResult).delay(2, TimeUnit.SECONDS).subscribeOn(Schedulers.io());
+        return Observable.just(--badRequestResult).delay(Utils.getRandomDelayMilliseconds(), TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io());
     }
 
 

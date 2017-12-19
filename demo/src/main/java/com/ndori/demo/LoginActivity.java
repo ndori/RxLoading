@@ -292,7 +292,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 // TODO: register the new account here.
                 return Observable.just(false);
             }
-        }).delaySubscription(2000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io());
+        }).delaySubscription(Utils.getRandomDelayMilliseconds(), TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io());
     }
 
 }

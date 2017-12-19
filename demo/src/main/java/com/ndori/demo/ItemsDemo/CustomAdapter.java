@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.ndori.demo.R;
+import com.ndori.demo.Utils;
 import com.ndori.rxloading.LoadingLayout;
 import com.ndori.rxloading.RxLoading;
 
@@ -64,8 +65,11 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
                     Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
                 }
             });
-            deleteButton = (Button) v.findViewById(R.id.delete);
             deleteLoadingLayout = (LoadingLayout) v.findViewById(R.id.delete_loadingLayout);
+            Utils.enlargeTouchAreaSides(deleteLoadingLayout);
+
+            deleteButton = (Button) v.findViewById(R.id.delete);
+            Utils.enlargeTouchAreaSides(deleteButton);
         }
 
         public TextView getTextView() {
@@ -115,7 +119,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         viewHolder.getDeleteButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Observable.just(viewHolder).delaySubscription(2, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
+                Observable.just(viewHolder).delaySubscription(Utils.getRandomDelayMilliseconds(), TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io())
                         .compose(RxLoading.<ViewHolder>create(viewHolder.getDeleteLoadingLayout()).setAllResultsAsDone())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Action1<ViewHolder>() {
