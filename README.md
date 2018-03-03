@@ -49,6 +49,13 @@ This library is made of 2 components:
 	 - You can use retry logic seamlessly, it will resubscribe to the stream in case of a retry button being hit.
 	 - And even more fine grained options...
 
+## **Download**
+make sure you are using jcneter as a repository
+```groovy
+dependencies {
+  compile 'com.ndori.rxloading:rxloading:0.9'
+}
+```
 ## **LoadingLayout Usage**
 Some of it's features are listed above, let's see how we use it.
 
