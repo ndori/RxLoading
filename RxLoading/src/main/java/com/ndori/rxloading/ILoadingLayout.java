@@ -27,14 +27,14 @@ import android.view.View;
 public interface ILoadingLayout {
 
     /**
-     * Set the state of one operation with id. <br/>
-     * If you want to use more than one operation on a single LoadingLayout use this method. <br/>
-     * The order state importance is as follows: <br/>
-     * {@link LoadingState#LOADING_FAIL} <br/>
-     * {@link LoadingState#LOADING} <br/>
-     * {@link LoadingState#DONE} <br/>
-     * {@link LoadingState#NO_DATA} <br/>
-     * e.g. if there is at least one fail it will show the fail view, otherwise for loading etc.... <br/>
+     * Set the state of one operation with id. <br>
+     * If you want to use more than one operation on a single LoadingLayout use this method. <br>
+     * The order state importance is as follows: <br>
+     * {@link LoadingState#LOADING_FAIL} <br>
+     * {@link LoadingState#LOADING} <br>
+     * {@link LoadingState#DONE} <br>s
+     * {@link LoadingState#NO_DATA} <br>
+     * e.g. if there is at least one fail it will show the fail view, otherwise for loading etc.... <br>
      *
      * @param operationId - a unique identifier for a certain operation, you must use it every time you want to change it's state
      * @param state the new state
@@ -95,7 +95,7 @@ public interface ILoadingLayout {
     void setFailedText(String failText);
 
     /**
-     * all the possible states for the layout to be in. <br/>
+     * all the possible states for the layout to be in. <br>
      * {@link #LOADING}, {@link #LOADING_FAIL}, {@link #DONE}, {@link #NO_DATA}
      */
     enum LoadingState {

@@ -36,35 +36,32 @@ import java.util.concurrent.atomic.AtomicReference;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 /**
- * Created by ndori. <br/> <br/>
+ * Created by ndori. <br> <br>
  * <p>
  * This class is a Transformer meant to ease the use of a {@link ILoadingLayout loading object} with RxJava observables.
- * <br/> <br/>
- * A common use is a network call which returns an observable, we than want to show a loading state until the data is retrieved. <br/>
- * when it is retrieved we want to show this data, but if some error is occurred we might want to show a different message, possibly with a "retry" option. <br/>
- * <br/>
- * let's say we have this method: {@link Observable} getDataFromNetwork(); <br/>
- * we then use it in some fashion, e.g. getDataFromNetwork().map(...).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(...); <br/>
- * in order to use rxloading all we have to do is add it somewhere on the chain, e.g. <br/>
- * getDataFromNetwork().compose(new rxloading(loadingObj))....subscribe(...) <br/>
- * <br/>
- * if the loadingObj is not available at the time of the Subscription creation you can do this: <br/>
- * rxloading rxLoading = new rxloading(); <br/>
- * .<br/>
- * .<br/>
- * getDataFromNetwork().compose(rxLoading)....subscribe(...)<br/>
- * .<br/>
- * .<br/>
- * .<br/>
- * rxLoading.bind(loadingObj); //obj is ready<br/>
+ * <br> <br>
+ * A common use is a network call which returns an observable, we than want to show a loading state until the data is retrieved. <br>
+ * when it is retrieved we want to show this data, but if some error is occurred we might want to show a different message, possibly with a "retry" option. <br>
+ * <br>
+ * let's say we have this method: {@link Observable} getDataFromNetwork(); <br>
+ * we then use it in some fashion, e.g. getDataFromNetwork().map(...).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(...); <br>
+ * in order to use rxloading all we have to do is add it somewhere on the chain, e.g. <br>
+ * getDataFromNetwork().compose(new rxloading(loadingObj))....subscribe(...) <br>
+ * <br>
+ * if the loadingObj is not available at the time of the Subscription creation you can do this: <br>
+ * rxloading rxLoading = new rxloading(); <br>
+ * .<br>
+ * .<br>
+ * getDataFromNetwork().compose(rxLoading)....subscribe(...)<br>
+ * .<br>
+ * .<br>
+ * .<br>
+ * rxLoading.bind(loadingObj); //obj is ready<br>
  */
 public class RxLoading<T> implements Observable.Transformer<T, T> {
 
