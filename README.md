@@ -1,3 +1,5 @@
+ [ ![Download](https://api.bintray.com/packages/ndori/RxLoading/RxLoading/images/download.svg) ](https://bintray.com/ndori/RxLoading/RxLoading/_latestVersion)
+
 # **RxLoading**
 
 An RxJava library for showing a loading (i.e. progress bar) state while waiting for async data with minimal effort and advanced options.
