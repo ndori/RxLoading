@@ -50,7 +50,7 @@ This library is made of 2 components:
 	 - And even more fine grained options...
 
 ## **Download**
-make sure you are using jcneter as a repository
+make sure you are using jcenter as a repository
 ```groovy
 dependencies {
   compile 'com.ndori.rxloading:rxloading:0.9'
