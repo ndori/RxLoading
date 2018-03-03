@@ -26,7 +26,7 @@ in your java code:
 
 and you are done!
 
-//TODO: add a gif here of loading
+<image src="https://media.giphy.com/media/8UHhqCn5qHdVblUhtP/giphy.gif"/>
 
 RxLoading will bind "loadingLayout" to your rx network call stream, when the stream is subscribed the layout will move to "loading" state, once an item arrives the loading is done.
 
@@ -48,6 +48,8 @@ This library is made of 2 components:
 	 - Supports multiple streams with one layout, and also multiple layouts with one stream.
 	 - You can use retry logic seamlessly, it will resubscribe to the stream in case of a retry button being hit.
 	 - And even more fine grained options...
+
+<image src="https://media.giphy.com/media/tItukBDGj5R0Ai67Dx/giphy.gif"/>
 
 ## **Download**
 make sure you are using jcenter as a repository
