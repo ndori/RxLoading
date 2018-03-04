@@ -1,4 +1,4 @@
- [ ![Download](https://api.bintray.com/packages/ndori/RxLoading/RxLoading/images/download.svg) ](https://bintray.com/ndori/RxLoading/RxLoading/_latestVersion)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-RxLoading-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/6802) [ ![Download](https://api.bintray.com/packages/ndori/RxLoading/RxLoading/images/download.svg) ](https://bintray.com/ndori/RxLoading/RxLoading/_latestVersion)
 
 # **RxLoading**
 
