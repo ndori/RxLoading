@@ -198,7 +198,7 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
                                 //this will be called only when there is a bind so it can't be null
                                 if (getLoadingInterface() != null && !getLoadingInterface().isRetryEnabled())
                                     return Observable.error(throwable); //if retry isn't enabled we want to propagate the error
-                                return retrySubject;
+                                return retrySubject.first();
                             }
                         })).repeatWhen(observable12 -> observable12.observeOn(AndroidSchedulers.mainThread()) //we need this because we are accessing the loadingLayout
                                 .delaySubscription(bindSubject)
@@ -209,7 +209,7 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
                                     if (loadingLayout != null &&
                                             (loadingLayout.getState() != LoadingState.LOADING_FAIL || !loadingLayout.isRetryEnabled()))
                                         return Observable.empty(); //if retry isn't enabled we want to propagate the complete
-                                    return retrySubject;
+                                    return retrySubject.first();
                                 }));
                 //TODO: I don't like the observeOn(AndroidSchedulers.mainThread()) in here, it might force sync with thread which may be slower
     }
