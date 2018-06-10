@@ -409,7 +409,8 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         loadingViewStub.setVisibility(GONE);
         loadingFailViewStub.setVisibility(GONE);
         loadingNoDataViewStub.setVisibility(GONE);
-        setVisibility(isHideRootView ? GONE : VISIBLE);
+        if (isHideRootView)
+            setVisibility(GONE);
     }
 
     private void setStateNoData() {
@@ -593,12 +594,12 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
     }
 
     /**
-     * class for saving state of a custom view, look at BuySellSwitchAndSpinBox for example
+     * class for saving state of a custom view
      */
     public static class SavedState extends View.BaseSavedState {
-        public SparseArray<Parcelable> childrenState;
+        private SparseArray<Parcelable> childrenState;
 
-        public SavedState(Parcelable superState) {
+        private SavedState(Parcelable superState) {
             super(superState);
         }
 
@@ -615,7 +616,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
 
         @SuppressLint("NewApi")
         public static final Creator<SavedState> CREATOR
-                = (Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB_MR2) ? (new ClassLoaderCreator<SavedState>() {
+                = new ClassLoaderCreator<SavedState>() {
             @Override
             public SavedState createFromParcel(Parcel source, ClassLoader loader) {
                 return new SavedState(source, loader);
@@ -629,21 +630,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
             public SavedState[] newArray(int size) {
                 return new SavedState[size];
             }
-        }) : (new Creator<SavedState>() {
-
-            public SavedState createFromParcel(Parcel source, ClassLoader loader) {
-                return new SavedState(source, loader);
-            }
-
-            @Override
-            public SavedState createFromParcel(Parcel source) {
-                return createFromParcel(source, null);
-            }
-
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        });
+        };
     }
     //**END OF FIX FOR SAVING VIEW PROPERLY**********************************************************************************************
 }
