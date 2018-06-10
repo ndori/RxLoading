@@ -431,7 +431,6 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
             setNoDataText();
         }
         loadingNoDataViewStub.setVisibility(VISIBLE);
-        setVisibility(VISIBLE);
     }
 
     private void setStateLoadingFail() {
@@ -455,7 +454,6 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
             setOnFailedRetryButtonClickListener();
         }
         loadingFailViewStub.setVisibility(VISIBLE);
-        setVisibility(VISIBLE);
     }
 
     public void setFailedRetryButtonText(String failRetryText) {
@@ -494,7 +492,6 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         }
 
         loadingViewStub.setVisibility(visibility);
-        setVisibility(VISIBLE);
     }
 
 
