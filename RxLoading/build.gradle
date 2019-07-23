@@ -33,7 +33,7 @@ ext {
     siteUrl = 'https://github.com/ndori/RxLoading'
     gitUrl = 'https://github.com/ndori/RxLoading.git'
 
-    libraryVersion = '0.9'
+    libraryVersion = '1.1'
 
     developerId = 'ndori'
     developerName = 'Nitzan Dori'
