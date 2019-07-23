@@ -85,7 +85,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
     private int customNoDataStateLayout = 0;
     private boolean isForceDoneVisibilityEnabled;
     private boolean intermediateBlank = true;
-    private boolean isHideRootView;
+    private boolean isLayoutVisibilityByRoot;
     private Button noDataActionButton;
     private String noDataActionButtonText;
     private ImageView loadingFailImageView;
@@ -186,8 +186,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         }
 
 
-        isHideRootView = getChildCount() <= 0; //the loadingLayout itself should be hidden instead of just the loading in case of done
-        int childCount = getChildCount();
+        isLayoutVisibilityByRoot = getChildCount() <= 0; //the loadingLayout itself should be hidden instead of just the loading in case of done
         inflate(getContext(), R.layout.loading_layout, this); //no need to inflate if all is custom
         loadingFailViewStub = initView(isCustomLoadingFailedStateLayout(), customLoadingFailedStateLayout, R.id.stub_loading_fail);
         loadingNoDataViewStub = initView(customNoDataStateLayout != 0, customNoDataStateLayout, R.id.stub_loading_no_data);
@@ -419,7 +418,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         loadingViewStub.setVisibility(GONE);
         loadingFailViewStub.setVisibility(GONE);
         loadingNoDataViewStub.setVisibility(GONE);
-        if (isHideRootView)
+        if (isLayoutVisibilityByRoot)
             setVisibility(GONE);
     }
 
@@ -441,6 +440,8 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
             setNoDataText();
         }
         loadingNoDataViewStub.setVisibility(VISIBLE);
+        if (isLayoutVisibilityByRoot)
+            setVisibility(VISIBLE);
     }
 
     private void setStateLoadingFail() {
@@ -464,6 +465,8 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
             setOnFailedRetryButtonClickListener();
         }
         loadingFailViewStub.setVisibility(VISIBLE);
+        if (isLayoutVisibilityByRoot)
+            setVisibility(VISIBLE);
     }
 
     public void setFailedRetryButtonText(String failRetryText) {
@@ -502,6 +505,8 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         }
 
         loadingViewStub.setVisibility(visibility);
+        if (isLayoutVisibilityByRoot)
+            setVisibility(VISIBLE);
     }
 
 

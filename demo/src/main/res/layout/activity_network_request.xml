@@ -18,7 +18,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.ndori.demo.NetworkRequestActivity"
-    tools:showIn="@layout/activity_main"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
