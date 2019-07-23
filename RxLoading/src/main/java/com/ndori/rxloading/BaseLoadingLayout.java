@@ -18,6 +18,16 @@ public abstract class BaseLoadingLayout implements ILoadingLayout {
     }
 
     @Override
+    public LoadingState removeState(String id){
+        return multiStateLoadingLayout.removeState(id);
+    }
+
+    @Override
+    public void clearMultiStates(){
+        multiStateLoadingLayout.clearMultiStates();
+    }
+
+    @Override
     public final LoadingState getState(String operationId) {
         return multiStateLoadingLayout.getState(operationId);
     }

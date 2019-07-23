@@ -28,6 +28,17 @@ public class MultiStateLoadingLayout {
         loadingLayout.setState(calcGlobalState());
     }
 
+    public ILoadingLayout.LoadingState removeState(String id){
+        final ILoadingLayout.LoadingState remove = multiState.remove(id);
+        loadingLayout.setState(calcGlobalState());
+        return remove;
+    }
+
+    public void clearMultiStates(){
+        multiState.clear();
+        loadingLayout.setState(calcGlobalState());
+    }
+
     private ILoadingLayout.LoadingState calcGlobalState() {
         if (multiState.containsValue(ILoadingLayout.LoadingState.LOADING_FAIL))
             return ILoadingLayout.LoadingState.LOADING_FAIL;

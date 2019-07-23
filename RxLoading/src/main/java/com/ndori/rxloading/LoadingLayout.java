@@ -49,10 +49,10 @@ import java.util.Set;
 //import java.util.HashSet;
 
 /**
- * A layout that includes a progressbar, a fail and empty state. <br>
- * it has the ability to hide and show other views. <br>
- * it can be used in several manners: <br>
- *     - Wrap the views you wish to hide (it is a frameLayout) <br>
+ * A layout that includes a progressbar, a fail and empty state. <br/>
+ * it has the ability to hide and show other views. <br/>
+ * it can be used in several manners: <br/>
+ *     - Wrap the views you wish to hide (it is a frameLayout) <br/>
 *      - be a sibling of the views you wish to hide and use attributes:  referenceSiblings /  referencedIds / invertReferencedIds
  */
 //TODO: fail and no-data layouts can be the same...
@@ -362,6 +362,16 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
     @Override
     public void setState(String id, LoadingState newState){
         multiStateLoadingLayout.setState(id, newState);
+    }
+
+    @Override
+    public LoadingState removeState(String operationId) {
+        return multiStateLoadingLayout.removeState(operationId);
+    }
+
+    @Override
+    public void clearMultiStates() {
+        multiStateLoadingLayout.clearMultiStates();
     }
 
     @Override

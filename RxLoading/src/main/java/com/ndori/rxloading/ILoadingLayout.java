@@ -16,6 +16,7 @@
 
 package com.ndori.rxloading;
 
+import android.support.annotation.Nullable;
 import android.view.View;
 
 /**
@@ -27,19 +28,33 @@ import android.view.View;
 public interface ILoadingLayout {
 
     /**
-     * Set the state of one operation with id. <br>
-     * If you want to use more than one operation on a single LoadingLayout use this method. <br>
-     * The order state importance is as follows: <br>
-     * {@link LoadingState#LOADING_FAIL} <br>
-     * {@link LoadingState#LOADING} <br>
-     * {@link LoadingState#DONE} <br>s
-     * {@link LoadingState#NO_DATA} <br>
-     * e.g. if there is at least one fail it will show the fail view, otherwise for loading etc.... <br>
+     * Set the state of one operation with id. <br/>
+     * If you want to use more than one operation on a single LoadingLayout use this method. <br/>
+     * The order state importance is as follows: <br/>
+     * {@link LoadingState#LOADING_FAIL} <br/>
+     * {@link LoadingState#LOADING} <br/>
+     * {@link LoadingState#DONE} <br/>
+     * {@link LoadingState#NO_DATA} <br/>
+     * e.g. if there is at least one fail it will show the fail view, otherwise for loading etc.... <br/>
      *
      * @param operationId - a unique identifier for a certain operation, you must use it every time you want to change it's state
      * @param state the new state
      */
     void setState(String operationId, LoadingState state);
+
+    /***
+     * remove a state with a certain operationId, and re-calc the state without it
+     * @param operationId and id set with {@link #setState(String, LoadingState)}
+     * @return the state of this operation if exists, null otherwise
+     */
+    LoadingState removeState(String operationId);
+
+    /**
+     * removes all multi states which was set with  {@link #setState(String, LoadingState)}
+     * use this if there were operations that no longer need to be attached to the state of this layout </br>
+     * e.g. when you re-subscribe with the same logical operation but with a different id
+     */
+    void clearMultiStates();
 
     /**
      * Will set the state of the loading interface, please consider usings {@link #setState(String, LoadingState)} for mutli-operations
@@ -95,7 +110,7 @@ public interface ILoadingLayout {
     void setFailedText(String failText);
 
     /**
-     * all the possible states for the layout to be in. <br>
+     * all the possible states for the layout to be in. <br/>
      * {@link #LOADING}, {@link #LOADING_FAIL}, {@link #DONE}, {@link #NO_DATA}
      */
     enum LoadingState {
@@ -117,10 +132,24 @@ public interface ILoadingLayout {
         DONE
     }
 
+    interface ILoadingStateConfiguration {
+
+        /**
+         * this will set the state and you should override it to add more functionality
+         * @param ILoadingLayout the layout the you will change
+         */
+        void set(ILoadingLayout ILoadingLayout);
+
+        /**
+         * this is used by RxLoading the set an immediate state even before calling set
+         * @return the state this configuration will set, if it doesn't change it you can return null
+         */
+        @Nullable LoadingState getState();
+    }
     /**
      * inherit from this to define an explicit configuration for {@link ILoadingLayout}
      */
-    class ILoadingStateConfiguration {
+    class BaseLoadingStateConfiguration implements ILoadingStateConfiguration  {
         final LoadingState state;
         private final String operationId;
 
@@ -129,7 +158,7 @@ public interface ILoadingLayout {
          * @param operationId the id to be used with {@link ILoadingLayout#setState(String, LoadingState)}
          * @param state the state to be used with {@link ILoadingLayout#setState(String, LoadingState)}
          */
-        public ILoadingStateConfiguration(String operationId, LoadingState state) {
+        public BaseLoadingStateConfiguration(String operationId, LoadingState state) {
             this.operationId = operationId;
             this.state = state;
         }
@@ -142,7 +171,7 @@ public interface ILoadingLayout {
             ILoadingLayout.setState(operationId, state);
         }
 
-
+        @Override
         public LoadingState getState() {
             return state;
         }
@@ -152,7 +181,7 @@ public interface ILoadingLayout {
      * a wrapper configuration for {@link LoadingState#LOADING_FAIL}
      * it allows you to change the text, retry and listener per configuration
      */
-    class FailILoadingStateConfiguration extends ILoadingStateConfiguration {
+    class FailILoadingStateConfiguration extends BaseLoadingStateConfiguration {
         private final String failText;
         private final Boolean isRetryEnabled;
         private final View.OnClickListener retryListener;
@@ -182,7 +211,7 @@ public interface ILoadingLayout {
     /***
      * a wrapper configuration for {@link LoadingState#DONE}
      */
-    class DoneILoadingStateConfiguration extends ILoadingStateConfiguration {
+    class DoneILoadingStateConfiguration extends BaseLoadingStateConfiguration {
 
         public DoneILoadingStateConfiguration(String operationId) {
             super(operationId, LoadingState.DONE);
@@ -192,7 +221,7 @@ public interface ILoadingLayout {
     /***
      * a wrapper configuration for {@link LoadingState#LOADING}
      */
-    class LoadingILoadingStateConfiguration extends ILoadingStateConfiguration {
+    class LoadingILoadingStateConfiguration extends BaseLoadingStateConfiguration {
 
         public LoadingILoadingStateConfiguration(String operationId) {
             super(operationId, LoadingState.LOADING);
@@ -203,7 +232,7 @@ public interface ILoadingLayout {
      * a wrapper configuration for {@link LoadingState#NO_DATA}
      * //TODO: add the ability to change some parameters here as well
      */
-    class NoDataILoadingStateConfiguration extends ILoadingStateConfiguration {
+    class NoDataILoadingStateConfiguration extends BaseLoadingStateConfiguration {
 
         public NoDataILoadingStateConfiguration(String operationId) {
             super(operationId, LoadingState.NO_DATA);

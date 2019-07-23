@@ -41,30 +41,33 @@ import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 /**
- * Created by ndori. <br> <br>
+ * Created by ndori. <br/> <br/>
  * <p>
  * This class is a Transformer meant to ease the use of a {@link ILoadingLayout loading object} with RxJava observables.
- * <br> <br>
- * A common use is a network call which returns an observable, we than want to show a loading state until the data is retrieved. <br>
- * when it is retrieved we want to show this data, but if some error is occurred we might want to show a different message, possibly with a "retry" option. <br>
- * <br>
- * let's say we have this method: {@link Observable} getDataFromNetwork(); <br>
- * we then use it in some fashion, e.g. getDataFromNetwork().map(...).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(...); <br>
- * in order to use rxloading all we have to do is add it somewhere on the chain, e.g. <br>
- * getDataFromNetwork().compose(new rxloading(loadingObj))....subscribe(...) <br>
- * <br>
- * if the loadingObj is not available at the time of the Subscription creation you can do this: <br>
- * rxloading rxLoading = new rxloading(); <br>
- * .<br>
- * .<br>
- * getDataFromNetwork().compose(rxLoading)....subscribe(...)<br>
- * .<br>
- * .<br>
- * .<br>
- * rxLoading.bind(loadingObj); //obj is ready<br>
+ * <br/> <br/>
+ * A common use is a network call which returns an observable, we than want to show a loading state until the data is retrieved. <br/>
+ * when it is retrieved we want to show this data, but if some error is occurred we might want to show a different message, possibly with a "retry" option. <br/>
+ * <br/>
+ * let's say we have this method: {@link Observable} getDataFromNetwork(); <br/>
+ * we then use it in some fashion, e.g. getDataFromNetwork().map(...).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(...); <br/>
+ * in order to use rxloading all we have to do is add it somewhere on the chain, e.g. <br/>
+ * getDataFromNetwork().compose(new rxloading(loadingObj))....subscribe(...) <br/>
+ * <br/>
+ * if the loadingObj is not available at the time of the Subscription creation you can do this: <br/>
+ * rxloading rxLoading = new rxloading(); <br/>
+ * .<br/>
+ * .<br/>
+ * getDataFromNetwork().compose(rxLoading)....subscribe(...)<br/>
+ * .<br/>
+ * .<br/>
+ * .<br/>
+ * rxLoading.bind(loadingObj); //obj is ready<br/>
  */
 public class RxLoading<T> implements Observable.Transformer<T, T> {
 
+    @Nullable
+    private LoadingState unsubscribeState = LoadingState.NO_DATA; //default state, it means that unsubscribe while loading considered a no data state
+    private boolean isRemoveStateOnUnsubscribe = false;
 
     public static <T> RxLoading<T> create(){
         return new RxLoading<>();
@@ -78,13 +81,23 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
     private WeakReference<ILoadingLayout> loadingInterface = new WeakReference<>(null);
 
     protected AtomicReference<LoadingState> state = new AtomicReference<>(null); //might be get and set from different threads
-    protected final String uuid = String.valueOf(UUID.randomUUID());
+    protected final String uuid;
 
     /**
      * @param ILoadingLayout loadingInterface must be ready to use it, otherwise use empty constructor and {@link #bind(ILoadingLayout)}
      */
     public RxLoading(ILoadingLayout ILoadingLayout) {
-        this();
+        this(String.valueOf(UUID.randomUUID()), ILoadingLayout);
+    }
+
+
+    /**
+     * use this if you want to set your own id, so you can create a new rxLoading that will be considered the same as another instance
+     * @param uuid and id used as operation id in {@link ILoadingLayout#setState(String, LoadingState)}
+     * @param ILoadingLayout loadingInterface must be ready to use it, otherwise use empty constructor and {@link #bind(ILoadingLayout)}
+     */
+    public RxLoading(String uuid, ILoadingLayout ILoadingLayout) {
+        this(uuid);
         bind(ILoadingLayout);
     }
 
@@ -92,6 +105,15 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
      * use this in case {@link ILoadingLayout ILoading} is not ready yet, then use  {@link #bind(ILoadingLayout)} when it is
      */
     public RxLoading() {
+        this(String.valueOf(UUID.randomUUID()));
+    }
+
+    /**
+     * use this if you want to set your own id, so you can create a new rxLoading that will be considered the same as another instance
+     * @param uuid and id used as operation id in {@link ILoadingLayout#setState(String, LoadingState)}
+     */
+    public RxLoading(String uuid) {
+        this.uuid = uuid;
         initConfigurations();
     }
 
@@ -146,9 +168,30 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
         return this;
     }
 
-    protected void setNoDataStateIfNeeded() {
-        if ( state == null || state.get().equals(LoadingState.LOADING) )  //we abuse the state of loading, should we?
-            scheduleSetState(LoadingState.NO_DATA);
+    /***
+     * default will set to {@link LoadingState#NO_DATA}, <br/>
+     * as the name suggest will set the given state if RxLoading is unsubscribe while it's in loading state
+     * @param state to be set in the above condition, can be null, in that case do nothing
+     * @return "this" so you can keep change it
+     */
+    public RxLoading<T> setStateWhenUnsubscribeWhileLoadingAs(@Nullable LoadingState state){
+        this.unsubscribeState = state;
+        return this;
+    }
+
+    /**
+     * when true it mean the state of the connected {@link ILoadingLayout} will no longer be connected to this object
+     * @param remove if true, {@link #setStateWhenUnsubscribeWhileLoadingAs(LoadingState)} will do nothing
+     * @return
+     */
+    public RxLoading<T> removeLoadingLayoutStateOnUnsubscribe(boolean remove){
+        isRemoveStateOnUnsubscribe = remove;
+        return this;
+    }
+
+    protected void ifLoadingSetStateAs(LoadingState state) {
+        if ( state != null && this.state == null || this.state.get().equals(LoadingState.LOADING) )  //we abuse the state of loading, should we?
+            scheduleSetState(state);
     }
 
     protected BehaviorSubject<ILoadingLayout.ILoadingStateConfiguration> configurationSubject = null;
@@ -175,7 +218,7 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
                 .doOnEach(new Subscriber<T>() {
                     @Override
                     public void onCompleted() {
-                        setNoDataStateIfNeeded();
+                        ifLoadingSetStateAs(LoadingState.NO_DATA);
                     }
 
                     @Override
@@ -190,7 +233,13 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
                     }
                 })
                 //in case we subscribe but no data arrived yet and we unsubscribe. this can be usuable in case the loading is blocking the ui
-                .doOnUnsubscribe(this::setNoDataStateIfNeeded).retryWhen(observable1 -> observable1.observeOn(AndroidSchedulers.mainThread()) //we need this because we are accessing the loadingLayout
+                .doOnUnsubscribe(() -> {
+                    if (isRemoveStateOnUnsubscribe){
+                        scheduleSetState(createClearStateConfiguration());
+                    } else {
+                        ifLoadingSetStateAs(unsubscribeState);
+                    }
+                }).retryWhen(observable1 -> observable1.observeOn(AndroidSchedulers.mainThread()) //we need this because we are accessing the loadingLayout
                         .delaySubscription(bindSubject)
                         .flatMap(new Func1<Throwable, Observable<?>>() {
                             @Override
@@ -212,6 +261,23 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
                                     return retrySubject.first();
                                 }));
                 //TODO: I don't like the observeOn(AndroidSchedulers.mainThread()) in here, it might force sync with thread which may be slower
+    }
+
+    @NonNull
+    private ILoadingStateConfiguration createClearStateConfiguration() {
+        //we don't really need to create it every time
+        return new ILoadingStateConfiguration() {
+            @Override
+            public void set(ILoadingLayout ILoadingLayout) {
+                ILoadingLayout.removeState(uuid);
+            }
+
+            @Nullable
+            @Override
+            public LoadingState getState() {
+                return null;
+            }
+        };
     }
 
 
@@ -266,7 +332,9 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
         scheduleSetState(configuration.get(state));
     }
     protected void scheduleSetState(final ILoadingStateConfiguration configuration) {
-        this.state.set(configuration.getState()); //we must do it immediately as other might look at it
+        final LoadingState state = configuration.getState();
+        if ( state != null) //NOTE: null should not be set as it is only in initialization state, change it if it do
+            this.state.set(state); //we must do it immediately as other might look at it
         configurationSubject.onNext(configuration);
     }
 
