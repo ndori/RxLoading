@@ -133,19 +133,13 @@ public class TestActivity extends AppCompatActivity {
         rxLoading.setStateProvider(new IntegerStateProvider());
         choose(badNetworkRequestInItem(), goodNetworkRequest())
                 .compose(rxLoading)
-                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() {
-            @Override
-            public void call(Integer integer) {
-                Log.e("DEBUG", "on Network Ended");
-                Toast.makeText(TestActivity.this, "Got number = " + integer, Toast.LENGTH_SHORT).show();
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                Toast.makeText(TestActivity.this, "ERROR!!!! - end of subscription", Toast.LENGTH_SHORT).show();
-                Log.e("DEBUG", "on Network Fail", throwable);
-            }
-        });
+                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(integer -> {
+                    Log.e("DEBUG", "on Network Ended");
+                    Toast.makeText(TestActivity.this, "Got number = " + integer, Toast.LENGTH_SHORT).show();
+                }, throwable -> {
+                    Toast.makeText(TestActivity.this, "ERROR!!!! - end of subscription", Toast.LENGTH_SHORT).show();
+                    Log.e("DEBUG", "on Network Fail", throwable);
+                });
         Handler handler = new Handler();
         handler.postDelayed(() -> rxLoading.bind(layout), 4000);
     }

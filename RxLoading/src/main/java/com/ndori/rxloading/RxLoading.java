@@ -241,14 +241,11 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
                     }
                 }).retryWhen(observable1 -> observable1.observeOn(AndroidSchedulers.mainThread()) //we need this because we are accessing the loadingLayout
                         .delaySubscription(bindSubject)
-                        .flatMap(new Func1<Throwable, Observable<?>>() {
-                            @Override
-                            public Observable<?> call(Throwable throwable) {
-                                //this will be called only when there is a bind so it can't be null
-                                if (getLoadingInterface() != null && !getLoadingInterface().isRetryEnabled())
-                                    return Observable.error(throwable); //if retry isn't enabled we want to propagate the error
-                                return retrySubject.first();
-                            }
+                        .flatMap((Func1<Throwable, Observable<?>>) throwable -> {
+                            //this will be called only when there is a bind so it can't be null
+                            if (getLoadingInterface() != null && !getLoadingInterface().isRetryEnabled())
+                                return Observable.error(throwable); //if retry isn't enabled we want to propagate the error
+                            return retrySubject.first();
                         })).repeatWhen(observable12 -> observable12.observeOn(AndroidSchedulers.mainThread()) //we need this because we are accessing the loadingLayout
                                 .delaySubscription(bindSubject)
                                 .flatMap((Func1<Void, Observable<?>>) none -> {

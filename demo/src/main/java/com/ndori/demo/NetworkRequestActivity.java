@@ -39,12 +39,7 @@ import static com.ndori.demo.RxUtils.choose;
 
 public class NetworkRequestActivity extends AppCompatActivity {
 
-    private final Action1<Throwable> onError = new Action1<Throwable>() {
-@Override
-public void call(Throwable throwable) {
-    Log.e("DEBUG", "on Network Fail", throwable);
-}
-};
+    private final Action1<Throwable> onError = throwable -> Log.e("DEBUG", "on Network Fail", throwable);
     private TextView dataArrviedText;
     private Action1<Integer> onDataArrived = new Action1<Integer>() {
         @Override

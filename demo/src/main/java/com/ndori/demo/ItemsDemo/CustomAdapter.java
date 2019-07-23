@@ -59,12 +59,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             super(v);
             // Define click listener for the ViewHolder's View.
             textView = (TextView) v.findViewById(R.id.textView);
-            textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
-                }
-            });
+            textView.setOnClickListener(v1 -> Log.d(TAG, "Element " + getAdapterPosition() + " clicked."));
             deleteLoadingLayout = (LoadingLayout) v.findViewById(R.id.delete_loadingLayout);
             Utils.enlargeTouchAreaSides(deleteLoadingLayout);
 
@@ -116,23 +111,14 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         // Get element from your dataset at this position and replace the contents of the view
         // with that element
         viewHolder.getTextView().setText(mDataSet.get(position));
-        viewHolder.getDeleteButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Observable.just(viewHolder).delaySubscription(Utils.getRandomDelayMilliseconds(), TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io())
-                        .compose(RxLoading.<ViewHolder>create(viewHolder.getDeleteLoadingLayout()).setAllResultsAsDone())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Action1<ViewHolder>() {
-                            @Override
-                            public void call(ViewHolder viewHolder) {
-                                int pos = viewHolder.getAdapterPosition();
-                                mDataSet.remove(pos);
-                                notifyItemRemoved(pos);
-                            }
-                        });
-
-            }
-        });
+        viewHolder.getDeleteButton().setOnClickListener(view -> Observable.just(viewHolder).delaySubscription(Utils.getRandomDelayMilliseconds(), TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io())
+                .compose(RxLoading.<ViewHolder>create(viewHolder.getDeleteLoadingLayout()).setAllResultsAsDone())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(viewHolder1 -> {
+                    int pos = viewHolder1.getAdapterPosition();
+                    mDataSet.remove(pos);
+                    notifyItemRemoved(pos);
+                }));
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)
 

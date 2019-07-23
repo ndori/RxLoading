@@ -58,12 +58,9 @@ public class ItemsActivity extends AppCompatActivity {
         Observable.just(newItemIndex++).delaySubscription(Utils.getRandomDelayMilliseconds(), TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io())
                 .compose(RxLoading.<Integer>create(addLoadingLayout))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Integer>() {
-                    @Override
-                    public void call(Integer itemIndex) {
-                        addItem(itemIndex);
-                        mAdapter.notifyItemInserted(itemIndex);
-                    }
+                .subscribe(itemIndex -> {
+                    addItem(itemIndex);
+                    mAdapter.notifyItemInserted(itemIndex);
                 });
     }
 
@@ -121,20 +118,10 @@ public class ItemsActivity extends AppCompatActivity {
         // END_INCLUDE(initializeRecyclerView)
 
         mLinearLayoutRadioButton = (RadioButton) findViewById(R.id.linear_layout_rb);
-        mLinearLayoutRadioButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setRecyclerViewLayoutManager(LayoutManagerType.LINEAR_LAYOUT_MANAGER);
-            }
-        });
+        mLinearLayoutRadioButton.setOnClickListener(v -> setRecyclerViewLayoutManager(LayoutManagerType.LINEAR_LAYOUT_MANAGER));
 
         mGridLayoutRadioButton = (RadioButton) findViewById(R.id.grid_layout_rb);
-        mGridLayoutRadioButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setRecyclerViewLayoutManager(LayoutManagerType.GRID_LAYOUT_MANAGER);
-            }
-        });
+        mGridLayoutRadioButton.setOnClickListener(v -> setRecyclerViewLayoutManager(LayoutManagerType.GRID_LAYOUT_MANAGER));
     }
 
     /**
