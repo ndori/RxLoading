@@ -25,12 +25,14 @@ import android.view.View;
 
 import com.ndori.rxloading.ILoadingLayout.ILoadingStateConfiguration;
 import com.ndori.rxloading.ILoadingLayout.LoadingState;
+import com.ndori.rxloading.loadingDelayPredictors.ILoadingDelayPredictor;
 import com.ndori.rxloading.stateProviders.IStateProvider;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import rx.Observable;
@@ -199,7 +201,9 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
     public Observable<T> call(Observable<T> observable) {
         if ( configurationSubject == null) {
             configurationSubject = BehaviorSubject.create(); //this will cause the last state once binded.
-            Observable.combineLatest(configurationSubject.delaySubscription(bindSubject), bindSubject, Pair::new)
+            Observable.combineLatest(configurationSubject.delaySubscription(bindSubject)
+                    .debounce(DelayedLoadingPredictorDebounceFunc())
+                    , bindSubject, Pair::new)
                     .delaySubscription(bindSubject) //it will only subscribe when we are first binded, this is not a must as combine will keep it working
                     .onBackpressureBuffer().observeOn(AndroidSchedulers.mainThread())
                     .subscribe(p -> {
@@ -328,13 +332,48 @@ public class RxLoading<T> implements Observable.Transformer<T, T> {
     protected void scheduleSetState(final LoadingState state) {
         scheduleSetState(configuration.get(state));
     }
+
+
     protected void scheduleSetState(final ILoadingStateConfiguration configuration) {
         final LoadingState state = configuration.getState();
+        LoadingState prevState = null;
         if ( state != null) //NOTE: null should not be set as it is only in initialization state, change it if it do
-            this.state.set(state); //we must do it immediately as other might look at it
+            prevState = this.state.getAndSet(state); //we must do it immediately as other might look at it
+        updatePredictor(prevState, state);
         configurationSubject.onNext(configuration);
     }
 
+    private Long lastLoadingStartTime = -1L;
+    private void updatePredictor(LoadingState prevState, LoadingState currentState) {
+        if ( prevState != LoadingState.LOADING && currentState == LoadingState.LOADING){
+            //start measurement
+            lastLoadingStartTime = System.nanoTime();
+        } else if ( prevState == LoadingState.LOADING && currentState == LoadingState.DONE && lastLoadingStartTime > 0L){
+            //stop measurement
+            if ( loadingDelayPredictor != null)
+                loadingDelayPredictor.onLoadingTime((System.nanoTime() - lastLoadingStartTime) / 1000000);
+            lastLoadingStartTime = -1L;
+        }
+    }
+    private @Nullable ILoadingDelayPredictor loadingDelayPredictor;
+    public RxLoading<T> setLoadingDelayPredictor(ILoadingDelayPredictor loadingDelayPredictor){
+        this.loadingDelayPredictor = loadingDelayPredictor;
+        return this;
+    }
+
+    @NonNull
+    private Func1<ILoadingStateConfiguration, Observable<Long>> DelayedLoadingPredictorDebounceFunc() {
+        return new Func1<ILoadingStateConfiguration, Observable<Long>>() {
+            LoadingState prev = null;
+            @Override
+            public Observable<Long> call(ILoadingStateConfiguration iLoadingStateConfiguration) {
+                final boolean isAllowDelay = prev != LoadingState.LOADING; //if there are 2 or more loading in a rows stop delaying
+                prev = iLoadingStateConfiguration.getState();
+                return isAllowDelay && loadingDelayPredictor != null &&
+                        iLoadingStateConfiguration.getState() == LoadingState.LOADING ? Observable.timer(loadingDelayPredictor.getDelayTime(), TimeUnit.MILLISECONDS) : Observable.just(0L);
+            }
+        };
+    }
 
 
     private static boolean isOtherThread() {
