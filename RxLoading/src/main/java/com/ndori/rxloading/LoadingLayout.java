@@ -188,7 +188,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
 
         isLayoutVisibilityByRoot = getChildCount() <= 0; //the loadingLayout itself should be hidden instead of just the loading in case of done
         inflate(getContext(), R.layout.loading_layout, this); //no need to inflate if all is custom
-        loadingFailViewStub = initView(isCustomLoadingFailedStateLayout(), customLoadingFailedStateLayout, R.id.stub_loading_fail);
+        loadingFailViewStub = initView(customLoadingFailedStateLayout != 0, customLoadingFailedStateLayout, R.id.stub_loading_fail);
         loadingNoDataViewStub = initView(customNoDataStateLayout != 0, customNoDataStateLayout, R.id.stub_loading_no_data);
         loadingViewStub = initView(customLoadingStateLayout != 0, customLoadingStateLayout, R.id.stub_loading);
     }
@@ -201,10 +201,6 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
             viewStub.setLayoutResource(customViewId);
         }
         return viewStub;
-    }
-
-    private boolean isCustomLoadingFailedStateLayout() {
-        return customLoadingFailedStateLayout != 0;
     }
 
 
@@ -428,7 +424,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         loadingFailViewStub.setVisibility(GONE);
 
         //one time lazy init
-        if ( customNoDataStateLayout == 0 && inflatedLoadingNoDataView == null) {
+        if (inflatedLoadingNoDataView == null) {
             inflatedLoadingNoDataView = loadingNoDataViewStub.inflate();
             noDataImageView = (ImageView) inflatedLoadingNoDataView.findViewById(R.id.noDataImage);
             noDataMessage = (TextView) inflatedLoadingNoDataView.findViewById(R.id.noDataMessage);
@@ -452,12 +448,11 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         //one time lazy init
         if ( inflatedLoadingFailView == null) {
             inflatedLoadingFailView = loadingFailViewStub.inflate();
-            if ( customLoadingStateLayout == 0) {
-                loadingFailedMessage = (TextView) inflatedLoadingFailView.findViewById(R.id.loadingFailedMessage);
-                setFailedText();
-                loadingFailImageView = (ImageView) inflatedLoadingFailView.findViewById(R.id.loadingFailedImage);
-                setFailImage();
-            }
+
+            loadingFailedMessage = (TextView) inflatedLoadingFailView.findViewById(R.id.loadingFailedMessage);
+            setFailedText();
+            loadingFailImageView = (ImageView) inflatedLoadingFailView.findViewById(R.id.loadingFailedImage);
+            setFailImage();
             //we assume that custom view has R.id.retryButton and it's a button if one's want a retry
             loadingFailedRetryButton = (Button) inflatedLoadingFailView.findViewById(R.id.retryButton);
             setIsRetryEnabled(isRetryEnabled);
